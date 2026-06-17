@@ -6,6 +6,7 @@
 <title>Lnk — Raccourcisseur d'URL</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { overflow-x: hidden; }
 :root {
   --bg: #1a1410; --surface: #2a2018; --card: #33241b;
   --border: #5a4a3a; --text: #f0eff8; --text-muted: #a09080;
@@ -29,7 +30,7 @@ body {
   transition: all .2s;
 }
 .theme-toggle:hover { border-color: var(--accent); background: var(--card); }
-.container { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
+.container { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; width: 100%; }
 
 header { text-align: center; margin-bottom: 2.5rem; }
 header h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.5px; }
@@ -109,6 +110,7 @@ td.clicks { text-align: center; color: var(--text-muted); font-variant-numeric: 
 .error { color: var(--red); font-size: 0.85rem; margin-top: 0.5rem; }
 
 .sort-indicator { margin-left: 3px; opacity: 0.5; }
+#linksContainer { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 </style>
 </head>
 <body>
