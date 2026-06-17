@@ -77,7 +77,6 @@ td.actions { text-align: right; white-space: nowrap; }
 td.clicks { text-align: center; color: var(--text-muted); font-variant-numeric: tabular-nums; }
 .short-link { color: var(--accent); text-decoration: none; font-weight: 500; }
 .short-link:hover { text-decoration: underline; }
-.short-link:hover { text-decoration: underline; }
 
 .detail-row { display: none; }
 .detail-row.open { display: table-row; }
@@ -221,7 +220,7 @@ let sortDir = -1;
 
 function sortBy(field) {
   if (sortField === field) sortDir *= -1;
-  else { sortField = field; sortDir = field === 'clicks' ? -1 : -1; }
+  else { sortField = field; sortDir = -1; }
   renderLinks(linksCache);
 }
 
@@ -257,7 +256,11 @@ function renderLinks(links) {
       </td>
     </tr>`;
     html += `<tr class="detail-row ${isOpen ? 'open' : ''}" id="detail-${l.id}">
-      <td colspan="5" class="detail-cell"><div class="detail-box" id="detail-content-${l.id}">${isOpen ? '<div class="loading-clicks"><span class="spinner" style="vertical-align:middle;margin-right:6px"></span> Chargement…</div>' : ''}</div></td>
+      <td colspan="5" class="detail-cell">
+        <div class="detail-box" id="detail-content-${l.id}">
+          <div class="loading-clicks"><span class="spinner" style="vertical-align:middle;margin-right:6px"></span> Chargement…</div>
+        </div>
+      </td>
     </tr>`;
   }
   tbody.innerHTML = html;
@@ -296,10 +299,14 @@ function toggleDetail(id) {
 function copyLink(url) { navigator.clipboard.writeText(url).then(() => toast('Copié !')); }
 
 async function removeLink(id) {
-  if (openDetail === id) openDetail = null;
-  await deleteLink(id);
-  await loadLinks();
-  toast('Supprimé');
+  try {
+    if (openDetail === id) openDetail = null;
+    await deleteLink(id);
+    await loadLinks();
+    toast('Supprimé');
+  } catch(e) {
+    toast('Erreur suppression');
+  }
 }
 
 async function loadLinks() {
@@ -329,7 +336,7 @@ document.getElementById('url').addEventListener('keydown', e => {
   if (e.key === 'Enter') document.getElementById('shortenBtn').click();
 });
 
-loadLinks();
+loadLinks().catch(() => toast('Impossible de charger les liens'));
 
 const toggle = document.getElementById('themeToggle');
 toggle.addEventListener('click', () => {
