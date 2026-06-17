@@ -20,6 +20,8 @@ export async function initDB() {
   )`;
   await sql`CREATE INDEX IF NOT EXISTS idx_links_slug ON links(slug)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_clicks_link ON clicks(link_id)`;
+  // migration: add title column if missing (v2)
+  try { await sql`ALTER TABLE links ADD COLUMN IF NOT EXISTS title TEXT DEFAULT ''`; } catch (_) {}
 }
 
 export async function getLinkBySlug(slug) {
