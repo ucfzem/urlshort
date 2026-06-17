@@ -12,8 +12,9 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
-    const { url, slug } = req.body;
+    let { url, slug } = req.body;
     if (!url) return res.status(400).json({ error: 'URL is required' });
+    if (!url.match(/^https?:\/\//i)) url = 'https://' + url;
 
     let finalSlug = slug || generateSlug();
     if (slug && await slugExists(slug)) {

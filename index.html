@@ -321,6 +321,7 @@ document.getElementById('shortenBtn').addEventListener('click', async () => {
   const slug = document.getElementById('slug').value.trim();
   const errorEl = document.getElementById('formError');
   if (!url) { errorEl.textContent = 'Entrez une URL'; errorEl.style.display = ''; return; }
+  if (!url.match(/^https?:\/\//i)) url = 'https://' + url;
   errorEl.style.display = 'none';
   const btn = document.getElementById('shortenBtn');
   btn.disabled = true; btn.innerHTML = '<span class="spinner" style="vertical-align:middle"></span>';
