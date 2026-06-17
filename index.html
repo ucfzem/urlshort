@@ -9,7 +9,7 @@
 :root {
   --bg: #0a0f1e; --surface: #111827; --card: #1a2332;
   --border: #1f2a3e; --text: #f0f4ff; --text-muted: #6b7fa8;
-  --accent: #4f6eff; --accent-dim: #2d4bd6; --green: #10b981;
+  --accent: #4f6eff; --green: #10b981;
   --red: #ef4444; --radius: 10px;
   --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
@@ -17,12 +17,12 @@ body {
   background: var(--bg); color: var(--text); font-family: var(--font);
   min-height: 100vh; line-height: 1.5;
 }
-.container { max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem; }
+.container { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
 
 header { text-align: center; margin-bottom: 2.5rem; }
 header h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.5px; }
 header h1 span { color: var(--accent); }
-header p { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.3rem; }
+header p { color: var(--text-muted); font-size: 0.9rem; }
 
 .card {
   background: var(--card); border: 1px solid var(--border);
@@ -30,7 +30,6 @@ header p { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.3rem; }
 }
 
 .form-group { margin-bottom: 1rem; }
-.form-group:last-child { margin-bottom: 0; }
 label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.3rem; }
 .input-row { display: flex; gap: 0.5rem; }
 .input-row input { flex: 1; }
@@ -50,47 +49,53 @@ input::placeholder { color: var(--text-muted); opacity: 0.6; }
 .btn:hover { opacity: 0.85; }
 .btn-primary { background: var(--accent); color: white; }
 .btn-danger { background: var(--red); color: white; }
+.btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+.btn-ghost:hover { background: var(--surface); }
 .btn-sm { padding: 0.4rem 0.75rem; font-size: 0.8rem; }
 
-table {
-  width: 100%; border-collapse: collapse;
-}
-th, td {
-  text-align: left; padding: 0.75rem 0.5rem; border-bottom: 1px solid var(--border);
-  font-size: 0.85rem;
-}
-th { color: var(--text-muted); font-weight: 500; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; }
-tr:last-child td { border-bottom: none; }
-td.url-cell { max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-td.actions { text-align: right; }
-td.clicks { text-align: center; color: var(--text-muted); }
-
-.short-link {
-  color: var(--accent); text-decoration: none; font-weight: 500;
-}
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 0.7rem 0.5rem; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+th { color: var(--text-muted); font-weight: 500; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; }
+th:hover { color: var(--text); }
+tr.link-row { cursor: pointer; transition: background 0.15s; }
+tr.link-row:hover { background: var(--surface); }
+td.url-cell { max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+td.actions { text-align: right; white-space: nowrap; }
+td.clicks { text-align: center; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.short-link { color: var(--accent); text-decoration: none; font-weight: 500; }
 .short-link:hover { text-decoration: underline; }
 
-.empty-state {
-  text-align: center; padding: 2rem; color: var(--text-muted);
-}
-.empty-state svg { width: 40px; height: 40px; margin-bottom: 0.8rem; opacity: 0.4; }
+.detail-row { display: none; }
+.detail-row.open { display: table-row; }
+.detail-cell { padding: 0 0.5rem 0.75rem !important; }
+.detail-box { background: var(--surface); border-radius: 8px; padding: 1rem; margin: 0; }
+.detail-box h4 { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem; }
+.click-item { font-size: 0.8rem; color: var(--text-muted); padding: 0.3rem 0; border-bottom: 1px solid var(--border); display: flex; gap: 1rem; }
+.click-item:last-child { border-bottom: none; }
+.click-item .ref { color: var(--text); max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.click-item .date { white-space: nowrap; }
+.click-item .ua { color: var(--text-muted); font-size: 0.75rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; }
+.loading-clicks { color: var(--text-muted); font-size: 0.8rem; padding: 0.5rem 0; }
+.empty-clicks { color: var(--text-muted); font-size: 0.8rem; padding: 0.5rem 0; font-style: italic; }
 
+.empty-state { text-align: center; padding: 2rem; color: var(--text-muted); }
+.empty-state svg { width: 40px; height: 40px; margin-bottom: 0.8rem; opacity: 0.4; }
 .toast {
   position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
   background: var(--green); color: white; padding: 0.6rem 1.2rem;
   border-radius: 8px; font-size: 0.85rem; font-weight: 600;
-  opacity: 0; transition: opacity 0.3s; pointer-events: none;
+  opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 100;
 }
 .toast.show { opacity: 1; }
-
 .spinner {
   display: inline-block; width: 16px; height: 16px;
   border: 2px solid var(--border); border-top-color: var(--accent);
   border-radius: 50%; animation: spin 0.6s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
-
 .error { color: var(--red); font-size: 0.85rem; margin-top: 0.5rem; }
+
+.sort-indicator { margin-left: 3px; opacity: 0.5; }
 </style>
 </head>
 <body>
@@ -115,7 +120,7 @@ td.clicks { text-align: center; color: var(--text-muted); }
     <div id="formError" class="error" style="display:none"></div>
   </div>
 
-  <div class="card" id="linksCard">
+  <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
       <h2 style="font-size:1rem;font-weight:600">Liens</h2>
       <span id="linkCount" style="font-size:0.8rem;color:var(--text-muted)">0</span>
@@ -126,7 +131,13 @@ td.clicks { text-align: center; color: var(--text-muted); }
         <p>Aucun lien pour l'instant</p>
       </div>
       <table id="linksTable" style="display:none">
-        <thead><tr><th>Slug</th><th>URL</th><th>Clics</th><th></th></tr></thead>
+        <thead><tr>
+          <th onclick="sortBy('slug')">Slug<span class="sort-indicator">⇅</span></th>
+          <th onclick="sortBy('url')">URL<span class="sort-indicator">⇅</span></th>
+          <th onclick="sortBy('clicks')" style="text-align:center">Clics<span class="sort-indicator">⇅</span></th>
+          <th onclick="sortBy('created_at')">Date<span class="sort-indicator">⇅</span></th>
+          <th></th>
+        </tr></thead>
         <tbody id="linksBody"></tbody>
       </table>
     </div>
@@ -136,10 +147,11 @@ td.clicks { text-align: center; color: var(--text-muted); }
 <div class="toast" id="toast"></div>
 
 <script>
-// ── Configuration ──
 const API = 'https://urlshort-rouge.vercel.app/api';
 const SHORT_DOMAIN = 'https://urlshort-rouge.vercel.app';
-// ────────────────────
+
+let linksCache = [];
+let openDetail = null;
 
 async function fetchLinks() {
   const res = await fetch(`${API}/links`);
@@ -149,24 +161,23 @@ async function fetchLinks() {
 
 async function createLink(url, slug) {
   const res = await fetch(`${API}/links`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ url, slug: slug || undefined })
   });
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.error || 'Erreur création');
-  }
+  if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'Erreur création'); }
   return res.json();
 }
 
 async function deleteLink(id) {
-  const res = await fetch(`${API}/links`, {
-    method: 'DELETE',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id })
+  await fetch(`${API}/links`, {
+    method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id })
   });
-  if (!res.ok) throw new Error('Erreur suppression');
+}
+
+async function fetchClicks(linkId) {
+  const res = await fetch(`${API}/clicks?linkId=${linkId}`);
+  if (!res.ok) return [];
+  return res.json();
 }
 
 function toast(msg) {
@@ -175,40 +186,102 @@ function toast(msg) {
   setTimeout(() => el.classList.remove('show'), 2500);
 }
 
+function escapeHtml(s) {
+  const d = document.createElement('div'); d.textContent = s; return d.innerHTML;
+}
+
+function formatDate(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString('fr-FR', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+}
+
+function shortUA(ua) {
+  if (!ua) return '-';
+  const m = ua.match(/(Chrome\/\d+|Firefox\/\d+|Safari\/\d+|Edge\/\d+|Mobile|iPhone|Android)/);
+  return m ? m[0] : ua.substring(0, 40);
+}
+
+let sortField = 'created_at';
+let sortDir = -1;
+
+function sortBy(field) {
+  if (sortField === field) sortDir *= -1;
+  else { sortField = field; sortDir = field === 'clicks' ? -1 : -1; }
+  renderLinks(linksCache);
+}
+
 function renderLinks(links) {
+  linksCache = links;
   const tbody = document.getElementById('linksBody');
   const table = document.getElementById('linksTable');
   const empty = document.getElementById('emptyState');
   const count = document.getElementById('linkCount');
-
   count.textContent = links.length;
 
-  if (!links.length) {
-    table.style.display = 'none'; empty.style.display = 'block';
-    return;
-  }
-
+  if (!links.length) { table.style.display = 'none'; empty.style.display = 'block'; return; }
   table.style.display = ''; empty.style.display = 'none';
 
+  const sorted = [...links].sort((a, b) => {
+    const va = a[sortField] || '', vb = b[sortField] || '';
+    if (sortField === 'clicks') return (va - vb) * sortDir;
+    return String(va).localeCompare(String(vb)) * sortDir;
+  });
+
   const base = SHORT_DOMAIN + '/go/';
-  tbody.innerHTML = links.map(l => `
-    <tr>
-      <td><a class="short-link" href="${base}${l.slug}" target="_blank">${l.slug}</a></td>
-      <td class="url-cell" title="${l.url.replace(/"/g,'&quot;')}">${l.url}</td>
+  let html = '';
+  for (const l of sorted) {
+    const isOpen = openDetail === l.id;
+    html += `<tr class="link-row" onclick="toggleDetail(${l.id})">
+      <td><a class="short-link" href="${base}${l.slug}" target="_blank" onclick="event.stopPropagation()">${l.slug}</a></td>
+      <td class="url-cell" title="${escapeHtml(l.url)}">${escapeHtml(l.url)}</td>
       <td class="clicks">${l.clicks}</td>
+      <td style="color:var(--text-muted);font-size:0.8rem">${formatDate(l.created_at)}</td>
       <td class="actions">
-        <button class="btn btn-sm btn-primary" onclick="copyLink('${base}${l.slug}')">Copier</button>
-        <button class="btn btn-sm btn-danger" onclick="removeLink(${l.id})" style="margin-left:4px">×</button>
+        <button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();copyLink('${base}${l.slug}')">Copier</button>
+        <button class="btn btn-sm btn-danger" onclick="event.stopPropagation();removeLink(${l.id})" style="margin-left:4px">×</button>
       </td>
-    </tr>
-  `).join('');
+    </tr>`;
+    html += `<tr class="detail-row ${isOpen ? 'open' : ''}" id="detail-${l.id}">
+      <td colspan="5" class="detail-cell"><div class="detail-box" id="detail-content-${l.id}">${isOpen ? '<div class="loading-clicks"><span class="spinner" style="vertical-align:middle;margin-right:6px"></span> Chargement…</div>' : ''}</div></td>
+    </tr>`;
+  }
+  tbody.innerHTML = html;
+
+  if (openDetail !== null) loadClicks(openDetail);
 }
 
-function copyLink(url) {
-  navigator.clipboard.writeText(url).then(() => toast('Copié !'));
+async function loadClicks(linkId) {
+  const box = document.getElementById(`detail-content-${linkId}`);
+  if (!box) return;
+  try {
+    const clicks = await fetchClicks(linkId);
+    if (!clicks.length) { box.innerHTML = '<div class="empty-clicks">Aucun clic enregistré</div>'; return; }
+    const items = clicks.map(c => {
+      const ref = c.referer ? `<span class="ref" title="${escapeHtml(c.referer)}">${escapeHtml(c.referer)}</span>` : '<span class="ref" style="color:var(--text-muted)">—</span>';
+      return `<div class="click-item">${ref}<span class="date">${formatDate(c.created_at)}</span><span class="ua">${escapeHtml(shortUA(c.user_agent))}</span></div>`;
+    }).join('');
+    box.innerHTML = `<h4>Derniers clics</h4>${items}`;
+  } catch(e) {
+    box.innerHTML = '<div class="empty-clicks">Erreur chargement</div>';
+  }
 }
+
+function toggleDetail(id) {
+  const wasOpen = openDetail === id;
+  // close all
+  document.querySelectorAll('.detail-row').forEach(r => r.classList.remove('open'));
+  openDetail = wasOpen ? null : id;
+  if (openDetail !== null) {
+    const row = document.getElementById(`detail-${id}`);
+    if (row) row.classList.add('open');
+    loadClicks(id);
+  }
+}
+
+function copyLink(url) { navigator.clipboard.writeText(url).then(() => toast('Copié !')); }
 
 async function removeLink(id) {
+  if (openDetail === id) openDetail = null;
   await deleteLink(id);
   await loadLinks();
   toast('Supprimé');
@@ -223,26 +296,18 @@ document.getElementById('shortenBtn').addEventListener('click', async () => {
   const url = document.getElementById('url').value.trim();
   const slug = document.getElementById('slug').value.trim();
   const errorEl = document.getElementById('formError');
-
   if (!url) { errorEl.textContent = 'Entrez une URL'; errorEl.style.display = ''; return; }
   errorEl.style.display = 'none';
-
   const btn = document.getElementById('shortenBtn');
   btn.disabled = true; btn.innerHTML = '<span class="spinner" style="vertical-align:middle"></span>';
-
   try {
     const link = await createLink(url, slug);
     document.getElementById('url').value = '';
     document.getElementById('slug').value = '';
     await loadLinks();
-    const base = SHORT_DOMAIN + '/go/';
-    toast(`✓ ${base}${link.slug}`);
-  } catch (e) {
-    errorEl.textContent = e.message;
-    errorEl.style.display = '';
-  } finally {
-    btn.disabled = false; btn.textContent = 'Raccourcir';
-  }
+    toast(`✓ ${SHORT_DOMAIN}/go/${link.slug}`);
+  } catch (e) { errorEl.textContent = e.message; errorEl.style.display = ''; }
+  finally { btn.disabled = false; btn.textContent = 'Raccourcir'; }
 });
 
 document.getElementById('url').addEventListener('keydown', e => {

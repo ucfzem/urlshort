@@ -1,6 +1,8 @@
 {
   "rewrites": [
-    { "source": "/go/(.*)", "destination": "/api/go/$1" }
+    { "source": "/go/(.*)", "destination": "/api/go/$1" },
+    { "source": "/sitemap.xml", "destination": "/api/sitemap.xml" },
+    { "source": "/robots.txt", "destination": "/api/robots.txt" }
   ],
   "headers": [
     {
