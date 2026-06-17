@@ -317,7 +317,7 @@ async function loadLinks() {
 }
 
 document.getElementById('shortenBtn').addEventListener('click', async () => {
-  const url = document.getElementById('url').value.trim();
+  let url = document.getElementById('url').value.trim();
   const slug = document.getElementById('slug').value.trim();
   const errorEl = document.getElementById('formError');
   if (!url) { errorEl.textContent = 'Entrez une URL'; errorEl.style.display = ''; return; }
