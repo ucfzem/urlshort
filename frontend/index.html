@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lnk — Raccourcisseur d'URL</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0a0f1e; --surface: #111827; --card: #1a2332;
+  --border: #1f2a3e; --text: #f0f4ff; --text-muted: #6b7fa8;
+  --accent: #4f6eff; --accent-dim: #2d4bd6; --green: #10b981;
+  --red: #ef4444; --radius: 10px;
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+body {
+  background: var(--bg); color: var(--text); font-family: var(--font);
+  min-height: 100vh; line-height: 1.5;
+}
+.container { max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+header { text-align: center; margin-bottom: 2.5rem; }
+header h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.5px; }
+header h1 span { color: var(--accent); }
+header p { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.3rem; }
+
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1.5rem;
+}
+
+.form-group { margin-bottom: 1rem; }
+.form-group:last-child { margin-bottom: 0; }
+label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.3rem; }
+.input-row { display: flex; gap: 0.5rem; }
+.input-row input { flex: 1; }
+input, button { font-family: var(--font); font-size: 0.9rem; }
+input {
+  width: 100%; padding: 0.65rem 0.9rem; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 6px; color: var(--text);
+  outline: none; transition: border-color 0.2s;
+}
+input:focus { border-color: var(--accent); }
+input::placeholder { color: var(--text-muted); opacity: 0.6; }
+
+.btn {
+  padding: 0.65rem 1.2rem; border: none; border-radius: 6px;
+  cursor: pointer; font-weight: 600; transition: opacity 0.2s; white-space: nowrap;
+}
+.btn:hover { opacity: 0.85; }
+.btn-primary { background: var(--accent); color: white; }
+.btn-danger { background: var(--red); color: white; }
+.btn-sm { padding: 0.4rem 0.75rem; font-size: 0.8rem; }
+
+table {
+  width: 100%; border-collapse: collapse;
+}
+th, td {
+  text-align: left; padding: 0.75rem 0.5rem; border-bottom: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+th { color: var(--text-muted); font-weight: 500; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; }
+tr:last-child td { border-bottom: none; }
+td.url-cell { max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+td.actions { text-align: right; }
+td.clicks { text-align: center; color: var(--text-muted); }
+
+.short-link {
+  color: var(--accent); text-decoration: none; font-weight: 500;
+}
+.short-link:hover { text-decoration: underline; }
+
+.empty-state {
+  text-align: center; padding: 2rem; color: var(--text-muted);
+}
+.empty-state svg { width: 40px; height: 40px; margin-bottom: 0.8rem; opacity: 0.4; }
+
+.toast {
+  position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+  background: var(--green); color: white; padding: 0.6rem 1.2rem;
+  border-radius: 8px; font-size: 0.85rem; font-weight: 600;
+  opacity: 0; transition: opacity 0.3s; pointer-events: none;
+}
+.toast.show { opacity: 1; }
+
+.spinner {
+  display: inline-block; width: 16px; height: 16px;
+  border: 2px solid var(--border); border-top-color: var(--accent);
+  border-radius: 50%; animation: spin 0.6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.error { color: var(--red); font-size: 0.85rem; margin-top: 0.5rem; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Lnk</h1>
+    <p>Raccourcisseur d'URL libre &amp; open source</p>
+  </header>
+
+  <div class="card">
+    <div class="form-group">
+      <label for="url">URL à raccourcir</label>
+      <div class="input-row">
+        <input id="url" type="url" placeholder="https://exemple.com/longue-url" autofocus>
+        <button class="btn btn-primary" id="shortenBtn">Raccourcir</button>
+      </div>
+    </div>
+    <div class="form-group" style="margin-top:0.7rem">
+      <label for="slug">Slug personnalisé (optionnel)</label>
+      <input id="slug" type="text" placeholder="mon-lien" style="max-width:250px">
+    </div>
+    <div id="formError" class="error" style="display:none"></div>
+  </div>
+
+  <div class="card" id="linksCard">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <h2 style="font-size:1rem;font-weight:600">Liens</h2>
+      <span id="linkCount" style="font-size:0.8rem;color:var(--text-muted)">0</span>
+    </div>
+    <div id="linksContainer">
+      <div class="empty-state" id="emptyState">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+        <p>Aucun lien pour l'instant</p>
+      </div>
+      <table id="linksTable" style="display:none">
+        <thead><tr><th>Slug</th><th>URL</th><th>Clics</th><th></th></tr></thead>
+        <tbody id="linksBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Configuration ──
+const API = 'https://urlshort-phi.vercel.app/api';   // ← Mets ton URL Vercel ici
+const SHORT_DOMAIN = 'https://urlshort-phi.vercel.app'; // ← idem pour les liens courts
+// ────────────────────
+
+async function fetchLinks() {
+  const res = await fetch(`${API}/links`);
+  if (!res.ok) throw new Error('Erreur chargement');
+  return res.json();
+}
+
+async function createLink(url, slug) {
+  const res = await fetch(`${API}/links`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url, slug: slug || undefined })
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || 'Erreur création');
+  }
+  return res.json();
+}
+
+async function deleteLink(id) {
+  const res = await fetch(`${API}/links`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id })
+  });
+  if (!res.ok) throw new Error('Erreur suppression');
+}
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+function renderLinks(links) {
+  const tbody = document.getElementById('linksBody');
+  const table = document.getElementById('linksTable');
+  const empty = document.getElementById('emptyState');
+  const count = document.getElementById('linkCount');
+
+  count.textContent = links.length;
+
+  if (!links.length) {
+    table.style.display = 'none'; empty.style.display = 'block';
+    return;
+  }
+
+  table.style.display = ''; empty.style.display = 'none';
+
+  const base = SHORT_DOMAIN + '/go/';
+  tbody.innerHTML = links.map(l => `
+    <tr>
+      <td><a class="short-link" href="${base}${l.slug}" target="_blank">${l.slug}</a></td>
+      <td class="url-cell" title="${l.url.replace(/"/g,'&quot;')}">${l.url}</td>
+      <td class="clicks">${l.clicks}</td>
+      <td class="actions">
+        <button class="btn btn-sm btn-primary" onclick="copyLink('${base}${l.slug}')">Copier</button>
+        <button class="btn btn-sm btn-danger" onclick="removeLink(${l.id})" style="margin-left:4px">×</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function copyLink(url) {
+  navigator.clipboard.writeText(url).then(() => toast('Copié !'));
+}
+
+async function removeLink(id) {
+  await deleteLink(id);
+  await loadLinks();
+  toast('Supprimé');
+}
+
+async function loadLinks() {
+  const links = await fetchLinks();
+  renderLinks(links);
+}
+
+document.getElementById('shortenBtn').addEventListener('click', async () => {
+  const url = document.getElementById('url').value.trim();
+  const slug = document.getElementById('slug').value.trim();
+  const errorEl = document.getElementById('formError');
+
+  if (!url) { errorEl.textContent = 'Entrez une URL'; errorEl.style.display = ''; return; }
+  errorEl.style.display = 'none';
+
+  const btn = document.getElementById('shortenBtn');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner" style="vertical-align:middle"></span>';
+
+  try {
+    const link = await createLink(url, slug);
+    document.getElementById('url').value = '';
+    document.getElementById('slug').value = '';
+    await loadLinks();
+    const base = SHORT_DOMAIN + '/go/';
+    toast(`✓ ${base}${link.slug}`);
+  } catch (e) {
+    errorEl.textContent = e.message;
+    errorEl.style.display = '';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Raccourcir';
+  }
+});
+
+document.getElementById('url').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('shortenBtn').click();
+});
+
+loadLinks();
+</script>
+</body>
+</html>
