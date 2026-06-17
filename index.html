@@ -330,7 +330,9 @@ document.getElementById('shortenBtn').addEventListener('click', async () => {
     document.getElementById('url').value = '';
     document.getElementById('slug').value = '';
     await loadLinks();
-    toast(`✓ ${SHORT_DOMAIN}/go/${link.slug}`);
+    const shortUrl = `${SHORT_DOMAIN}/go/${link.slug}`;
+    navigator.clipboard.writeText(shortUrl);
+    toast(`✓ Copié ! ${shortUrl}`);
   } catch (e) { errorEl.textContent = e.message; errorEl.style.display = ''; }
   finally { btn.disabled = false; btn.textContent = 'Raccourcir'; }
 });
