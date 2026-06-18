@@ -101,6 +101,18 @@ td.clicks { text-align: center; color: var(--text-muted); font-variant-numeric: 
   opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 100;
 }
 .toast.show { opacity: 1; }
+.copy-overlay {
+  position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.6); z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+.copy-overlay.show { opacity: 1; }
+.copy-overlay-inner {
+  background: var(--card); border: 1px solid var(--accent); border-radius: 16px;
+  padding: 2.5rem 3rem; text-align: center; max-width: 90%;
+}
+.copy-overlay-inner .icon { font-size: 3rem; margin-bottom: 0.5rem; }
+.copy-overlay-inner .msg { font-size: 1.2rem; font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+.copy-overlay-inner .url { font-size: 0.85rem; color: var(--text-muted); word-break: break-all; }
 .spinner {
   display: inline-block; width: 16px; height: 16px;
   border: 2px solid var(--border); border-top-color: var(--accent);
@@ -140,6 +152,7 @@ td.clicks { text-align: center; color: var(--text-muted); font-variant-numeric: 
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
       <h2 style="font-size:1rem;font-weight:600">Liens</h2>
       <span id="linkCount" style="font-size:0.8rem;color:var(--text-muted)">0</span>
+      <button class="btn btn-sm btn-ghost" id="clearBtn" onclick="clearAll()" style="color:var(--red)">Tout effacer</button>
     </div>
     <div id="linksContainer">
       <div class="empty-state" id="emptyState">
@@ -161,6 +174,13 @@ td.clicks { text-align: center; color: var(--text-muted); font-variant-numeric: 
 </div>
 
 <div class="toast" id="toast"></div>
+<div class="copy-overlay" id="copyOverlay">
+  <div class="copy-overlay-inner">
+    <div class="icon">✓</div>
+    <div class="msg">Copié !</div>
+    <div class="url" id="copyUrl"></div>
+  </div>
+</div>
 
 <script>
 const API = 'https://urlshort-rouge.vercel.app/api';
@@ -311,6 +331,15 @@ async function removeLink(id) {
   }
 }
 
+async function clearAll() {
+  if (!confirm('Supprimer tous les liens ?')) return;
+  const links = await fetchLinks();
+  for (const l of links) await deleteLink(l.id);
+  openDetail = null;
+  await loadLinks();
+  toast('Tout supprimé');
+}
+
 async function loadLinks() {
   const links = await fetchLinks();
   renderLinks(links);
@@ -332,7 +361,9 @@ document.getElementById('shortenBtn').addEventListener('click', async () => {
     await loadLinks();
     const shortUrl = `${SHORT_DOMAIN}/go/${link.slug}`;
     navigator.clipboard.writeText(shortUrl);
-    toast(`✓ Copié ! ${shortUrl}`);
+    document.getElementById('copyUrl').textContent = shortUrl;
+    document.getElementById('copyOverlay').classList.add('show');
+    setTimeout(() => document.getElementById('copyOverlay').classList.remove('show'), 2000);
   } catch (e) { errorEl.textContent = e.message; errorEl.style.display = ''; }
   finally { btn.disabled = false; btn.textContent = 'Raccourcir'; }
 });
